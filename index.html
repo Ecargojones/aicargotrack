@@ -1,1 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AiCargoTrack - Professional Air Cargo Tracking System | Real-time Air Freight Tracking Service</title>
+    <meta name="description" content="AiCargoTrack provides global air cargo tracking services, helping you monitor your shipments in real-time to ensure safe and efficient transportation.">
+    <meta name="keywords" content="air cargo tracking, freight tracking, shipment tracking, air freight, logistics tracking">
+    <link rel="canonical" href="https://aicargotrack.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appleBlue: '#0071e3',
+                        appleGray: '#f5f5f7',
+                        appleBlack: '#1d1d1f',
+                        appleLightGray: '#86868b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .iframe-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 aspect ratio */
+        }
+        .responsive-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    
+    <!-- Add JavaScript for tracking functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const trackButton = document.getElementById('trackButton');
+            const awbInput = document.getElementById('awbInput');
+            const airlineSelect = document.getElementById('airlineSelect');
+            const trackingResults = document.getElementById('trackingResults');
+            const awbDisplay = document.getElementById('awbDisplay');
+            const carrierDisplay = document.getElementById('carrierDisplay');
+            
+            // Add event listener to track button
+            trackButton.addEventListener('click', function() {
+                const awbNumber = awbInput.value.trim();
+                const selectedAirline = airlineSelect.options[airlineSelect.selectedIndex].text;
+                
+                if (awbNumber) {
+                    // Format AWB with hyphen (e.g., 123-45678901)
+                    const formattedAwb = formatAwbNumber(awbNumber);
+                    
+                    // Update tracking result with AWB and carrier info
+                    awbDisplay.textContent = formattedAwb;
+                    
+                    if (selectedAirline !== 'Select Airline (optional)') {
+                        const carrierCode = getCarrierCode(selectedAirline);
+                        carrierDisplay.textContent = `${selectedAirline} (${carrierCode})`;
+                    } else {
+                        carrierDisplay.textContent = 'Unknown Carrier';
+                    }
+                    
+                    // Show tracking results section
+                    trackingResults.classList.remove('hidden');
+                    
+                    // Scroll to results
+                    trackingResults.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Please enter an AWB number');
+                }
+            });
+            
+            // Format AWB number (add hyphen after 3 digits)
+            function formatAwbNumber(awb) {
+                // Remove any non-digit characters
+                const cleanAwb = awb.replace(/\D/g, '');
+                
+                if (cleanAwb.length >= 4) {
+                    return cleanAwb.substring(0, 3) + '-' + cleanAwb.substring(3);
+                }
+                return cleanAwb;
+            }
+            
+            // Get carrier code from airline name
+            function getCarrierCode(airline) {
+                const carrierMap = {
+                    'Air China': 'CA',
+                    'American Airlines': 'AA',
+                    'British Airways': 'BA',
+                    'Cathay Pacific': 'CX',
+                    'Delta Airlines': 'DL',
+                    'Emirates': 'EK',
+                    'Lufthansa': 'LH',
+                    'Qatar Airways': 'QR',
+                    'Singapore Airlines': 'SQ',
+                    'United Airlines': 'UA'
+                };
+                
+                return carrierMap[airline] || airline.substring(0, 2).toUpperCase();
+            }
+        });
+    </script>
+</head>
+<body class="bg-appleGray text-appleBlack">
+    <!-- Navigation Bar - Simplified -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="text-xl font-bold text-appleBlue">
+                        AiCargoTrack
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Custom Tracking Section - replacing iframe -->
+        <section id="tracking" class="bg-white rounded-2xl shadow-lg p-6 mb-12">
+            <div class="bg-blue-600 text-white py-4 px-6 rounded-t-lg -mt-6 -mx-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-2xl font-bold mb-2 md:mb-0">Air Cargo Tracking</div>
+                    <div class="text-sm">Track your shipment by AWB number or airline</div>
+                </div>
+            </div>
+            
+            <!-- Tracking Form -->
+            <div class="mb-8">
+                <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Track by Air Waybill (AWB) Number</h3>
+                    <form class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3" onsubmit="return false;">
+                        <div class="flex-grow">
+                            <input type="text" id="awbInput" placeholder="Enter AWB number (11 digits without spaces)" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <select id="airlineSelect" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Select Airline (optional)</option>
+                                <option>Air China</option>
+                                <option>American Airlines</option>
+                                <option>British Airways</option>
+                                <option>Cathay Pacific</option>
+                                <option>Delta Airlines</option>
+                                <option>Emirates</option>
+                                <option>Lufthansa</option>
+                                <option>Qatar Airways</option>
+                                <option>Singapore Airlines</option>
+                                <option>United Airlines</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="button" id="trackButton" class="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Track
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Track by Airline</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">AA</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">American Airlines</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">BA</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">British Airways</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">CA</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Air China</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">CX</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Cathay Pacific</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">DL</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Delta Airlines</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">EK</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Emirates</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">LH</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Lufthansa</a>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold">SQ</span>
+                            </div>
+                            <a href="#" class="text-blue-600 hover:underline">Singapore Airlines</a>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button type="button" class="text-blue-600 hover:underline text-sm">
+                            View all airlines
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sample Tracking Results (initially hidden, can be shown with JavaScript) -->
+            <div id="trackingResults" class="hidden">
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tracking Results</h3>
+                    <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                        <p class="font-medium">AWB: <span id="awbDisplay">123-45678901</span> • Carrier: <span id="carrierDisplay">Emirates (EK)</span></p>
+                        <p class="text-sm text-gray-600">Origin: Hong Kong (HKG) • Destination: Los Angeles (LAX)</p>
+                    </div>
+                    
+                    <div class="relative pb-8">
+                        <div class="absolute top-0 bottom-0 left-4 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="relative flex items-start mb-6">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-4 ring-white">
+                                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Delivered</p>
+                                <p class="text-xs text-gray-500">May.14, 2023 10:30 AM</p>
+                                <p class="mt-1 text-sm text-gray-700">Shipment delivered to consignee</p>
+                                <p class="text-xs text-gray-500">Los Angeles, USA</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start mb-6">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-4 ring-white">
+                                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Arrived at Destination</p>
+                                <p class="text-xs text-gray-500">May.13, 2023 7:45 PM</p>
+                                <p class="mt-1 text-sm text-gray-700">Shipment has arrived at destination airport</p>
+                                <p class="text-xs text-gray-500">Los Angeles International Airport, USA</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start mb-6">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-4 ring-white">
+                                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">In Transit</p>
+                                <p class="text-xs text-gray-500">May.12, 2023 11:20 PM</p>
+                                <p class="mt-1 text-sm text-gray-700">Shipment departed from origin airport</p>
+                                <p class="text-xs text-gray-500">Hong Kong International Airport, HK</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-4 ring-white">
+                                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Shipment Received</p>
+                                <p class="text-xs text-gray-500">May.12, 2023 8:15 AM</p>
+                                <p class="mt-1 text-sm text-gray-700">Shipment received by carrier</p>
+                                <p class="text-xs text-gray-500">Hong Kong, HK</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-500 mt-6">
+                <p>Notes:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>For accurate tracking, please enter the complete Air Waybill number (11 digits)</li>
+                    <li>Tracking information is typically updated every 2-4 hours</li>
+                    <li>For urgent inquiries, please contact the airline or carrier directly</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Flight Route Search Section (inspired by flightmapper.net) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 mb-12">
+            <div class="bg-green-600 text-white py-4 px-6 rounded-t-lg -mt-6 -mx-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-2xl font-bold mb-2 md:mb-0">Flight Route Search</div>
+                    <div class="text-sm">Find cargo flights between airports and explore routes</div>
+                </div>
+            </div>
+            
+            <!-- Airport Route Search Form -->
+            <div class="mb-8">
+                <div class="bg-green-50 rounded-lg p-4 mb-4">
+                    <h3 class="text-lg font-semibold text-green-800 mb-3">Search Cargo Flights by Route</h3>
+                    <form class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                        <div class="flex-grow">
+                            <div class="flex space-x-2">
+                                <div class="w-1/2">
+                                    <label for="origin" class="block text-sm font-medium text-gray-700 mb-1">Origin Airport</label>
+                                    <input type="text" id="origin" placeholder="Airport code (e.g. HKG)" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div class="w-1/2">
+                                    <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">Destination Airport</label>
+                                    <input type="text" id="destination" placeholder="Airport code (e.g. LAX)" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:self-end">
+                            <button type="button" class="w-full md:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                Search Flights
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sample Flight Routes Results (initially hidden) -->
+            <div class="hidden">
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Available Cargo Flights: Hong Kong (HKG) to Los Angeles (LAX)</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Airline</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flight</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aircraft</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span class="font-bold">CX</span>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Cathay Pacific</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">CX 880</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Daily: 16:25 - 13:45</div>
+                                        <div class="text-xs text-gray-500">13h 20m</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        Boeing 777-300ER
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        25 tons
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span class="font-bold">FX</span>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">FedEx Express</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">FX 5193</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Tu, Th, Sa: 23:55 - 21:15</div>
+                                        <div class="text-xs text-gray-500">12h 20m</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        Boeing 777F
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        102 tons
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Airport Cargo Operations Section -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 mb-12">
+            <div class="bg-purple-600 text-white py-4 px-6 rounded-t-lg -mt-6 -mx-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-2xl font-bold mb-2 md:mb-0">Global Airport Code Search</div>
+                    <div class="text-sm">Search for IATA three-letter codes and information of airports worldwide</div>
+                </div>
+            </div>
+            
+            <!-- Airport Search Form -->
+            <div class="mb-8">
+                <div class="bg-purple-50 rounded-lg p-4 mb-4">
+                    <h3 class="text-lg font-semibold text-purple-800 mb-3">Airport Code Lookup</h3>
+                    <form class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                        <div class="flex-grow">
+                            <label for="airport" class="block text-sm font-medium text-gray-700 mb-1">Enter Airport Code or City Name</label>
+                            <input type="text" id="airport" placeholder="Enter code (e.g. PEK) or city name (e.g. Beijing)" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div class="md:self-end">
+                            <button type="button" class="w-full md:w-auto px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="text-sm text-gray-500 mt-4">
+                    <p>Common Airport Codes Reference:</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">PEK</span> - Beijing Capital Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">PVG</span> - Shanghai Pudong Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">CAN</span> - Guangzhou Baiyun Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">LAX</span> - Los Angeles Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">JFK</span> - New York Kennedy Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">LHR</span> - London Heathrow Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">FRA</span> - Frankfurt Int'l Airport
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <span class="font-bold">SIN</span> - Singapore Changi Airport
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sample Airport Information (initially hidden) -->
+            <div class="hidden">
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Beijing Capital International Airport (PEK)</h3>
+                        <div class="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full">Major International Airport</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-sm font-medium text-gray-500">City</div>
+                            <div class="text-xl font-bold text-gray-900">Beijing, China</div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-sm font-medium text-gray-500">ICAO Code</div>
+                            <div class="text-xl font-bold text-gray-900">ZBAA</div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="text-sm font-medium text-gray-500">Time Zone</div>
+                            <div class="text-xl font-bold text-gray-900">UTC+8</div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-md font-semibold text-gray-800 mb-3">Airport Information</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm"><strong>Address:</strong> Airport Road, Shunyi District, Beijing, China</p>
+                                <p class="text-sm"><strong>Phone:</strong> +86 10 96158</p>
+                                <p class="text-sm"><strong>Website:</strong> <a href="#" class="text-blue-600 hover:underline">www.bcia.com.cn</a></p>
+                                <p class="text-sm"><strong>Elevation:</strong> 35 meters</p>
+                            </div>
+                            <div>
+                                <p class="text-sm"><strong>Terminals:</strong> 3 terminals</p>
+                                <p class="text-sm"><strong>Runways:</strong> 3 runways</p>
+                                <p class="text-sm"><strong>Annual Passengers:</strong> Approx. 100 million</p>
+                                <p class="text-sm"><strong>Operating Hours:</strong> 24 hours</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-md font-semibold text-gray-800 mb-3">Major Airlines</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+                        <div class="bg-gray-50 p-2 rounded text-center">
+                            <div class="font-bold">CA</div>
+                            <div class="text-sm">Air China</div>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-center">
+                            <div class="font-bold">MU</div>
+                            <div class="text-sm">China Eastern Airlines</div>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-center">
+                            <div class="font-bold">CZ</div>
+                            <div class="text-sm">China Southern Airlines</div>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-center">
+                            <div class="font-bold">HU</div>
+                            <div class="text-sm">Hainan Airlines</div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-md font-semibold text-gray-800 mb-3">Transportation</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-sm"><strong>Airport Express:</strong> About 25 minutes from downtown Beijing</p>
+                        <p class="text-sm"><strong>Taxi:</strong> About 45 minutes from city center</p>
+                        <p class="text-sm"><strong>Bus:</strong> Multiple airport shuttle routes connecting to major city locations</p>
+                        <p class="text-sm"><strong>Driving:</strong> Accessible via the Airport Expressway</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <p class="text-appleLightGray mb-4">AiCargoTrack provides comprehensive air cargo tracking services, including:</p>
+                <ul class="list-disc pl-6 text-appleLightGray space-y-2">
+                    <li>Real-time cargo location tracking</li>
+                    <li>Transport status updates and notifications</li>
+                    <li>Estimated arrival time calculation</li>
+                    <li>Historical shipping data analysis</li>
+                    <li>Multi-airline cargo consolidated tracking</li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <p class="text-appleLightGray mb-4">The advantages of choosing AiCargoTrack:</p>
+                <ul class="list-disc pl-6 text-appleLightGray space-y-2">
+                    <li>Coverage of major global airlines and freight forwarders</li>
+                    <li>Real-time data updates with high accuracy</li>
+                    <li>Simple and intuitive user interface</li>
+                    <li>Multi-language support with 24/7 customer service</li>
+                    <li>Advanced API for system integration</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="about" class="bg-white rounded-2xl shadow-lg p-6 mb-12">
+            <p class="text-appleLightGray mb-4">
+                AiCargoTrack is an innovative company focused on air cargo tracking technology. We are committed to providing the most advanced and reliable air cargo tracking solutions for global customers. By integrating data from airlines and logistics providers worldwide, our platform delivers real-time, accurate cargo location information, helping customers optimize supply chain management and improve operational efficiency.
+            </p>
+            <p class="text-appleLightGray">
+                Our technical team has extensive experience in aviation logistics and advanced data processing capabilities, continuously optimizing tracking algorithms to ensure service quality remains at industry-leading levels. Whether you are a logistics company, import/export trader, or an individual tracking a personal package, AiCargoTrack can meet your needs.
+            </p>
+        </section>
+
+        <section id="contact" class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-appleLightGray mb-4">
+                        If you have any questions or requirements, please feel free to contact us. Our professional team will provide you with the highest quality service and support.
+                    </p>
+                    <div class="space-y-2 text-appleLightGray">
+                        <p><strong>Email:</strong> globegsa@gmail.com</p>
+                        <p><strong>WeChat:</strong> jnb931</p>
+                    </div>
+                </div>
+                <form class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-appleLightGray">Name</label>
+                        <input type="text" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-appleBlue focus:ring focus:ring-appleBlue focus:ring-opacity-50">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-appleLightGray">Email</label>
+                        <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-appleBlue focus:ring focus:ring-appleBlue focus:ring-opacity-50">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-appleLightGray">Message</label>
+                        <textarea id="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-appleBlue focus:ring focus:ring-appleBlue focus:ring-opacity-50"></textarea>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer - Simplified -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center text-sm text-appleLightGray">
+                <p><strong>Contact Us:</strong> Email: globegsa@gmail.com | WeChat: jnb931</p>
+                <p class="mt-4">&copy; 2023 AiCargoTrack.com All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
